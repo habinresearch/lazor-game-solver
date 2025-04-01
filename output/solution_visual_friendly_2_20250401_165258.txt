@@ -1,3 +1,0 @@
-o   o   A
-A   x   A
-o   A   o

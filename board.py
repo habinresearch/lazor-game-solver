@@ -57,7 +57,10 @@ class Board:
         return self.fixed_blocks + self.free_blocks_placed
 
     def is_placeable(self, i, j):
-        """Return True if no free block is already placed at original cell (i, j)."""
+        # Do not allow placement in cells that are disallowed by the grid.
+        if self.orig_grid[i][j] == "x":
+            return False
+        # Also ensure that no free block is already placed at (i, j).
         for block in self.free_blocks_placed:
             if block.orig_pos == (i, j):
                 return False

@@ -1,1 +1,0 @@
-[((0, 0), 'OpaqueBlock'), ((1, 0), 'ReflectBlock'), ((2, 0), 'OpaqueBlock'), ((2, 2), 'ReflectBlock'), ((3, 0), 'ReflectBlock'), ((4, 0), 'OpaqueBlock')]
