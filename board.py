@@ -1,6 +1,7 @@
 # board.py
 
 from blocks import ReflectBlock, OpaqueBlock, RefractBlock
+import copy
 
 
 class Board:
@@ -78,3 +79,10 @@ class Board:
             if block.orig_pos == (i, j):
                 del self.free_blocks_placed[idx]
                 return
+
+    def clone(self):
+        """
+        Create and return a deep copy of the board, ensuring that mutable state
+        (like block states) is completely independent.
+        """
+        return copy.deepcopy(self)

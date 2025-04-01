@@ -81,23 +81,23 @@ def solve(board):
 
 def test_solution(board, targets):
     """
-    Simulate laser paths on the simulation board.
-    For each beam, check if its next position lies within any placed block's boundaries.
-    Uses a beam queue; if a collision is detected, the block's interact() is used to compute the new direction.
-    Returns True if all targets are hit; otherwise, False.
+    Simulate laser paths on a cloned board so that mutable block states (e.g. in RefractBlock)
+    do not persist across simulation runs. Returns True if all targets are hit; otherwise, False.
     """
-    # Log the visual board to the visual logger at the start of each test_solution run.
+    # Create a fresh copy of the board for the simulation.
+    board_copy = board.clone()
+
+    # Log the visual board from the cloned board.
     visual_logger = logging.getLogger("visual")
-    visual_board = visualize_board(board)
+    visual_board = visualize_board(board_copy)
     visual_logger.debug("Visual board at start of test_solution:\n%s", visual_board)
 
     remaining_targets = set(targets)
     max_steps = 200
 
-    blocks = board.get_placed_blocks()
+    blocks = board_copy.get_placed_blocks()
     beam_queue = []
-    # Each beam is now represented as (x, y, dx, dy, steps)
-    for lx, ly, vx, vy in board.lasers:
+    for lx, ly, vx, vy in board_copy.lasers:
         beam_queue.append((lx, ly, vx, vy, 0))
         logging.debug(
             "Starting beam from (%d, %d) with direction (%d, %d)", lx, ly, vx, vy
@@ -121,8 +121,8 @@ def test_solution(board, targets):
         logging.debug("Beam step %d: moving to (%d, %d)", steps + 1, next_x, next_y)
 
         if not (
-            0 <= next_x < board.orig_width * 2 + 1
-            and 0 <= next_y < board.orig_height * 2 + 1
+            0 <= next_x < board_copy.orig_width * 2 + 1
+            and 0 <= next_y < board_copy.orig_height * 2 + 1
         ):
             logging.debug("Beam left board from (%d, %d)", next_x, next_y)
             continue
