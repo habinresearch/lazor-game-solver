@@ -1,0 +1,1 @@
+[((1, 1), 'ReflectBlock'), ((2, 0), 'ReflectBlock'), ((2, 4), 'ReflectBlock'), ((3, 2), 'ReflectBlock'), ((4, 0), 'ReflectBlock'), ((4, 4), 'ReflectBlock'), ((5, 1), 'ReflectBlock'), ((5, 3), 'ReflectBlock')]
