@@ -45,7 +45,7 @@ class Board:
         self.free_positions = []
         for i in range(self.orig_height):
             for j in range(self.orig_width):
-                if self.orig_grid[i][j] != "x":
+                if self.orig_grid[i][j] not in ["x", "A", "B", "C"]:
                     self.free_positions.append((i, j))
 
         # Free blocks placed during solving.
