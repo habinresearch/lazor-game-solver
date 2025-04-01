@@ -96,14 +96,15 @@ def test_solution(board, targets):
 
     blocks = board.get_placed_blocks()
     beam_queue = []
+    # Each beam is now represented as (x, y, dx, dy, steps)
     for lx, ly, vx, vy in board.lasers:
-        beam_queue.append((lx, ly, lx, ly, vx, vy, 0))
+        beam_queue.append((lx, ly, vx, vy, 0))
         logging.debug(
             "Starting beam from (%d, %d) with direction (%d, %d)", lx, ly, vx, vy
         )
 
     while beam_queue:
-        sx, sy, x, y, dx, dy, steps = beam_queue.pop(0)
+        x, y, dx, dy, steps = beam_queue.pop(0)
         logging.debug(
             "Beam step %d: current position (%d, %d) with direction (%d, %d)",
             steps,
@@ -151,9 +152,7 @@ def test_solution(board, targets):
                 break
 
         if collided_block is not None:
-            new_directions = collided_block.interact(
-                (dx, dy), (sx, sy), (next_x, next_y)
-            )
+            new_directions = collided_block.interact((dx, dy), (next_x, next_y))
             if not new_directions:
                 logging.debug("Beam stopped by block at (%d, %d)", next_x, next_y)
             else:
@@ -168,9 +167,7 @@ def test_solution(board, targets):
                         new_dx,
                         new_dy,
                     )
-                    beam_queue.append(
-                        (sx, sy, next_x, next_y, new_dx, new_dy, steps + 1)
-                    )
+                    beam_queue.append((next_x, next_y, new_dx, new_dy, steps + 1))
         else:
-            beam_queue.append((sx, sy, next_x, next_y, dx, dy, steps + 1))
+            beam_queue.append((next_x, next_y, dx, dy, steps + 1))
     return len(remaining_targets) == 0
