@@ -1,0 +1,3 @@
+B   A   B
+B   o   A
+A   o   B

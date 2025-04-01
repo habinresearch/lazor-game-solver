@@ -13,77 +13,70 @@ def log_board_state(board, message="Current board state"):
 def solve(board):
     """
     Use backtracking to place free blocks into candidate positions until a solution is found.
+    This version accounts for permutations by trying each available free block type at every
+    candidate position.
     Returns a list of free block placements (their original positions and types) or None.
     """
     targets = set(board.points)
-    # Create free blocks list from board.blocks_available.
-    free_blocks = []
-    free_blocks += [ReflectBlock() for _ in range(board.blocks_available.get("A", 0))]
-    free_blocks += [OpaqueBlock() for _ in range(board.blocks_available.get("B", 0))]
-    free_blocks += [RefractBlock() for _ in range(board.blocks_available.get("C", 0))]
 
-    # Candidate positions are those stored in board.free_positions.
+    # Use a counts dictionary for free blocks available by type.
+    free_blocks_counts = {
+        "A": board.blocks_available.get("A", 0),
+        "B": board.blocks_available.get("B", 0),
+        "C": board.blocks_available.get("C", 0),
+    }
+
     positions = board.free_positions
 
-    def backtrack(i, pos_index):
-        logging.debug(
-            "Backtracking: free block index = %d, candidate pos index = %d",
-            i,
-            pos_index,
-        )
-        log_board_state(board, f"After {i} placements, candidate index {pos_index}")
-
-        if i == len(free_blocks):
-            logging.debug("All free blocks placed; checking solution.")
+    def backtrack(pos_index, free_counts):
+        # If no free blocks remain, check if the board is a solution.
+        if all(count == 0 for count in free_counts.values()):
             if test_solution(board, targets):
                 sol = [
                     (block.orig_pos, type(block).__name__)
                     for block in board.free_blocks_placed
                 ]
-                logging.info("Solution found: %s", sol)
-                log_board_state(board, "Final solution board state")
                 return sol
             else:
-                logging.debug("Solution check failed with current full placement.")
-            return None
+                return None
 
+        # If we've exhausted positions, backtrack.
         if pos_index >= len(positions):
-            logging.debug("No more candidate positions for free block index = %d.", i)
             return None
 
         # Option 1: Skip the current candidate position.
-        result = backtrack(i, pos_index + 1)
+        result = backtrack(pos_index + 1, free_counts)
         if result is not None:
             return result
 
-        # Option 2: Try placing a free block at positions[pos_index].
-        i_pos, j_pos = positions[pos_index]
-        if board.is_placeable(i_pos, j_pos):
-            block = free_blocks[i]
-            board.place_free_block(i_pos, j_pos, block)
-            logging.debug(
-                "Placed %s at original cell (%d, %d)",
-                type(block).__name__,
-                i_pos,
-                j_pos,
-            )
-            log_board_state(board, f"After placing free block {i} at ({i_pos},{j_pos})")
-            result = backtrack(i + 1, pos_index + 1)
-            if result is not None:
-                return result
-            board.remove_free_block(i_pos, j_pos)
-            logging.debug(
-                "Removed %s from original cell (%d, %d) during backtracking",
-                type(block).__name__,
-                i_pos,
-                j_pos,
-            )
-            log_board_state(
-                board, f"After removing free block {i} from ({i_pos},{j_pos})"
-            )
+        # Option 2: Try placing each type of free block at the current position (if available).
+        i, j = positions[pos_index]
+        if board.is_placeable(i, j):
+            for block_type in ["A", "B", "C"]:
+                if free_counts.get(block_type, 0) > 0:
+                    # Instantiate the block based on type.
+                    if block_type == "A":
+                        block = ReflectBlock()
+                    elif block_type == "B":
+                        block = OpaqueBlock()
+                    elif block_type == "C":
+                        block = RefractBlock()
+
+                    # Place the block and decrement its count.
+                    board.place_free_block(i, j, block)
+                    free_counts[block_type] -= 1
+
+                    result = backtrack(pos_index + 1, free_counts)
+                    if result is not None:
+                        return result
+
+                    # Backtrack: remove the block and restore its count.
+                    board.remove_free_block(i, j)
+                    free_counts[block_type] += 1
+
         return None
 
-    return backtrack(0, 0)
+    return backtrack(0, free_blocks_counts.copy())
 
 
 def test_solution(board, targets):
@@ -93,6 +86,11 @@ def test_solution(board, targets):
     Uses a beam queue; if a collision is detected, the block's interact() is used to compute the new direction.
     Returns True if all targets are hit; otherwise, False.
     """
+    # Log the visual board to the visual logger at the start of each test_solution run.
+    visual_logger = logging.getLogger("visual")
+    visual_board = visualize_board(board)
+    visual_logger.debug("Visual board at start of test_solution:\n%s", visual_board)
+
     remaining_targets = set(targets)
     max_steps = 200
 

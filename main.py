@@ -24,17 +24,19 @@ def main():
     bff_file = sys.argv[1]
     data = parse_bff_file(bff_file)
 
-    # Create logs directory if it doesn't exist.
+    # Create logs and output directories if they don't exist.
     if not os.path.exists("logs"):
         os.makedirs("logs")
+    if not os.path.exists("output"):
+        os.makedirs("output")
 
     # Extract the bff file name (without path or extension) and timestamp.
     bff_basename = os.path.basename(bff_file)  # e.g., dark_1.bff
     bff_name, _ = os.path.splitext(bff_basename)  # e.g., dark_1
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_filename = f"logs/solver_debug_{bff_name}_{timestamp}.log"
 
-    # Configure logging here so all modules share this configuration.
+    # First log file: full debug logging.
+    log_filename = f"logs/solver_debug_{bff_name}_{timestamp}.log"
     logging.basicConfig(
         filename=log_filename,
         level=logging.DEBUG,
@@ -42,17 +44,31 @@ def main():
     )
     logging.info("Started solver for file: %s", bff_file)
 
+    # Second log file: only visual board outputs.
+    visual_log_filename = f"logs/solver_visual_{bff_name}_{timestamp}.log"
+    visual_logger = logging.getLogger("visual")
+    # Prevent visual_logger from propagating to the root logger.
+    visual_logger.propagate = False
+    visual_logger.setLevel(logging.DEBUG)
+    visual_handler = logging.FileHandler(visual_log_filename)
+    visual_formatter = logging.Formatter("%(asctime)s - %(message)s")
+    visual_handler.setFormatter(visual_formatter)
+    visual_logger.addHandler(visual_handler)
+    logging.info("Visual logger initialized with file: %s", visual_log_filename)
+
     # Initialize board and solve.
     board = Board(data)
-    solution = solve(board)
+    solution = solve(
+        board
+    )  # This function will log board visualizations to visual_logger.
 
     if solution is not None:
         print("Solution found!")
-        with open("output/solution.txt", "w") as f:
+        with open(f"output/solution_{bff_name}_{timestamp}.txt", "w") as f:
             f.write(str(solution))
         visual = visualize_board(board)
         print(visual)
-        with open("output/solution_visual.txt", "w") as f:
+        with open(f"output/solution_visual_{bff_name}_{timestamp}.txt", "w") as f:
             f.write(visual)
     else:
         print("No solution found.")
