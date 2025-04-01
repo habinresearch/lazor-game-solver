@@ -15,14 +15,13 @@ logging.basicConfig(
 # (You can adjust the grid, block counts, lasers, and points as needed.)
 data = {
     "grid": [
-        ["o", "o", "o", "o"],
-        ["o", "o", "o", "o"],
-        ["o", "o", "o", "o"],
-        ["o", "o", "o", "o"],
+        ["o", "B", "o"],
+        ["o", "o", "o"],
+        ["o", "o", "o"],
     ],
-    "blocks_available": {"A": 2, "B": 0, "C": 1},
-    "lasers": [(2, 7, 1, -1)],  # x, y, vx, vy (example values)
-    "points": [(3, 0), (4, 3), (2, 5), (4, 7)],
+    "blocks_available": {"A": 3, "B": 0, "C": 1},
+    "lasers": [(4, 5, -1, -1)],  # x, y, vx, vy (example values)
+    "points": [(1, 2), (6, 3)],
 }
 
 # Create the board.
@@ -32,9 +31,10 @@ board = Board(data)
 # For example, to place a free ReflectBlock at cell (1,1):
 from blocks import ReflectBlock, RefractBlock
 
+board.place_free_block(0, 0, ReflectBlock())
+board.place_free_block(0, 2, ReflectBlock())
 board.place_free_block(2, 0, ReflectBlock())
-board.place_free_block(1, 3, ReflectBlock())
-board.place_free_block(0, 2, RefractBlock())
+board.place_free_block(2, 1, RefractBlock())
 
 # Visualize the board (prints a text version and logs it).
 print("Initial board:")

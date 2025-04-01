@@ -82,12 +82,10 @@ def solve(board):
 def test_solution(board, targets):
     """
     Simulate laser paths on a cloned board so that mutable block states (e.g. in RefractBlock)
-    do not persist across simulation runs. Returns True if all targets are hit; otherwise, False.
+    do not persist across simulation runs.
+    Returns True if all targets are hit; otherwise, False.
     """
-    # Create a fresh copy of the board for the simulation.
     board_copy = board.clone()
-
-    # Log the visual board from the cloned board.
     visual_logger = logging.getLogger("visual")
     visual_board = visualize_board(board_copy)
     visual_logger.debug("Visual board at start of test_solution:\n%s", visual_board)
@@ -105,6 +103,52 @@ def test_solution(board, targets):
 
     while beam_queue:
         x, y, dx, dy, steps = beam_queue.pop(0)
+
+        # Special handling for beams at their initial position.
+        if steps == 0:
+            epsilon = 0.1  # a small offset
+            # Check slightly ahead in the beam's direction
+            initial_check_x = x + epsilon * dx
+            initial_check_y = y + epsilon * dy
+
+            collided_block = None
+            for block in blocks:
+                if block.within_boundaries(initial_check_x, initial_check_y):
+                    collided_block = block
+                    logging.debug(
+                        "Initial beam collision at (%.1f, %.1f) with %s at original cell %s",
+                        initial_check_x,
+                        initial_check_y,
+                        type(block).__name__,
+                        block.orig_pos,
+                    )
+                    break
+            if collided_block is not None:
+                new_directions = collided_block.interact((dx, dy), (x, y))
+                if not new_directions:
+                    logging.debug(
+                        "Beam stopped immediately by block at initial position."
+                    )
+                    continue  # Beam stops immediately.
+                else:
+                    for new_dir in new_directions:
+                        new_dx, new_dy = new_dir
+                        logging.debug(
+                            "Initial beam collision produced new beam with direction (%d, %d)",
+                            new_dx,
+                            new_dy,
+                        )
+                        beam_queue.append(
+                            (
+                                x,
+                                y,
+                                new_dx,
+                                new_dy,
+                                steps + 1,
+                            )
+                        )
+                continue  # Skip the normal move since we've handled the initial collision.
+
         logging.debug(
             "Beam step %d: current position (%d, %d) with direction (%d, %d)",
             steps,
