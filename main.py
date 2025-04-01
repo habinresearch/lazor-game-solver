@@ -13,6 +13,7 @@ from parser_bff import parse_bff_file
 from board import Board
 from solver import solve
 from visualization import visualize_board
+from visualization_image import save_laser_image
 
 
 def main():
@@ -50,13 +51,19 @@ def main():
         print("Solution found!")
         with open("output/solution.txt", "w") as f:
             f.write(str(solution))
-        visual = visualize_board(board)
-        print(visual)
-        with open("output/solution_visual.txt", "w") as f:
-            f.write(visual)
+        #visual = visualize_board(board)
+
+        f = "output/solution_visual.png"
+        save_laser_image(board, solution, f)
+        print(f'Solution saved to {f}')
+        #print(visual)
+        #with open("output/solution_visual.txt", "w") as f:
+            #f.write(visual)
     else:
         print("No solution found.")
 
 
 if __name__ == "__main__":
     main()
+
+    
