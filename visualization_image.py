@@ -5,10 +5,8 @@ from matplotlib.patches import Rectangle
 def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
     # while in bounds
     is_first_turn = True
-    # print(f'grid_size_x: {grid_size_x}, grid_size_y: {grid_size_y}')
     while (0 < x < grid_size_x and 0 < y < grid_size_y) or is_first_turn:
         # move lazor
-        #print(f'before: x: {x}, y: {y}')
         x += vx
         y += vy
 
@@ -28,10 +26,8 @@ def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
                     found_collision = True
                     break # only care about first possible collision
         if found_collision:
-            # print('hi', x, y, new_directions)
-            if 0 < x < grid_size_x and 0 < y < grid_size_y:
+            if 0 <= x <= grid_size_x and 0 <= y <= grid_size_y:
                 return x, y, new_directions
-        #print(f'after: x: {x}, y: {y}')
         if is_first_turn:
             is_first_turn = False
 
