@@ -147,11 +147,6 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
                  lazor_length_x, lazor_length_y,
                  head_width=0.2, head_length=0.2, fc='red', ec='red')
 
-    ax.axis('off')
-    ax.set_aspect('equal')
-    plt.gca().invert_yaxis()
-    plt.savefig(filename, bbox_inches='tight')
-    plt.close()
     ax.arrow(
         start_x,
         start_y,
