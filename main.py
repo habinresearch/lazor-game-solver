@@ -63,25 +63,11 @@ def main():
         print("Solution found!")
         with open(f"output/solution_{bff_name}_{timestamp}.txt", "w") as f:
             f.write(str(solution))
-<<<<<<< HEAD
         #visual = visualize_board(board)
 
         f = "output/solution_visual.png"
         save_laser_image(board, solution, f)
         print(f'Solution saved to {f}')
-        #print(visual)
-        #with open("output/solution_visual.txt", "w") as f:
-            #f.write(visual)
-=======
-        visual = visualize_board(board)
-        print(visual)
-        with open(f"output/solution_visual_{bff_name}_{timestamp}.txt", "w") as f:
-            f.write(visual)
-
-        image_filename = f"output/solution_visual_{bff_name}_{timestamp}.png"
-        save_laser_image(board, solution, image_filename)
-        print(f"Solution saved to {image_filename}")
->>>>>>> bbc42e4e2541b64d69ed58dfb580187f45faa233
     else:
         print("No solution found.")
 
