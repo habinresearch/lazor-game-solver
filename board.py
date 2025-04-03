@@ -1,6 +1,7 @@
 # board.py
 
 from blocks import ReflectBlock, OpaqueBlock, RefractBlock
+import copy
 
 
 class Board:
@@ -45,7 +46,7 @@ class Board:
         self.free_positions = []
         for i in range(self.orig_height):
             for j in range(self.orig_width):
-                if self.orig_grid[i][j] != "x":
+                if self.orig_grid[i][j] not in ["x", "A", "B", "C"]:
                     self.free_positions.append((i, j))
 
         # Free blocks placed during solving.
@@ -56,7 +57,10 @@ class Board:
         return self.fixed_blocks + self.free_blocks_placed
 
     def is_placeable(self, i, j):
-        """Return True if no free block is already placed at original cell (i, j)."""
+        # Do not allow placement in cells that are disallowed by the grid.
+        if self.orig_grid[i][j] == "x":
+            return False
+        # Also ensure that no free block is already placed at (i, j).
         for block in self.free_blocks_placed:
             if block.orig_pos == (i, j):
                 return False
@@ -78,3 +82,10 @@ class Board:
             if block.orig_pos == (i, j):
                 del self.free_blocks_placed[idx]
                 return
+
+    def clone(self):
+        """
+        Create and return a deep copy of the board, ensuring that mutable state
+        (like block states) is completely independent.
+        """
+        return copy.deepcopy(self)

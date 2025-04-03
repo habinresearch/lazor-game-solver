@@ -39,26 +39,35 @@ class Block:
             # Flip vertical component.
             return (dx, -dy)
 
-    def interact(self, beam_direction, beam_origin, beam_position):
+    def interact(self, beam_direction, beam_position):
         """Default: do nothing."""
         return [beam_direction]
 
 
 class ReflectBlock(Block):
-    def interact(self, beam_direction, beam_origin, beam_position):
+    def interact(self, beam_direction, beam_position):
         new_dir = self.reflect_beam(beam_position, beam_direction)
         return [new_dir]
 
 
 class OpaqueBlock(Block):
-    def interact(self, beam_direction, beam_origin, beam_position):
+    def interact(self, beam_direction, beam_position):
         # Stop the beam.
         return []
 
 
 class RefractBlock(Block):
-    def interact(self, beam_direction, beam_origin, beam_position):
-        # Beam continues and also gets reflected.
-        cont = beam_direction
-        refl = self.reflect_beam(beam_position, beam_direction)
-        return [cont, refl]
+    def __init__(self, fixed=False):
+        super().__init__(fixed)
+        self.has_refracted = False
+
+    def interact(self, beam_direction, beam_position):
+        # On the first interaction, generate both beams.
+        if not self.has_refracted:
+            self.has_refracted = True
+            cont = beam_direction
+            refl = self.reflect_beam(beam_position, beam_direction)
+            return [cont, refl]
+        else:
+            # On subsequent interactions, only the beam that continues.
+            return [beam_direction]
