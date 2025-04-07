@@ -6,6 +6,7 @@ class Board:
     """
     Represents the Lazor game board, including fixed and placeable blocks, lasers, and target points.
     """
+
     def __init__(self, data):
         """
         Initialize the board using the provided configuration.

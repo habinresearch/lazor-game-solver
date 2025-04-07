@@ -7,6 +7,7 @@ class Block:
         top, left, bottom, right (int): Boundaries of the block on the board.
         orig_pos (tuple): Original (i, j) grid position of the block.
     """
+
     def __init__(self, fixed=False):
         self.fixed = fixed
         self.top = None
@@ -89,6 +90,7 @@ class ReflectBlock(Block):
     """
     Reflective block that bounces the beam off its surface.
     """
+
     def interact(self, beam_direction, beam_position):
         new_dir = self.reflect_beam(beam_position, beam_direction)
         return [new_dir]
@@ -98,6 +100,7 @@ class OpaqueBlock(Block):
     """
     Opaque block that absorbs the beam, stopping it completely.
     """
+
     def interact(self, beam_direction, beam_position):
         return []  # No beams continue.
 
@@ -108,6 +111,7 @@ class RefractBlock(Block):
     one continues, the other reflects. On subsequent interactions,
     only the continuing beam remains.
     """
+
     def __init__(self, fixed=False):
         super().__init__(fixed)
         self.has_refracted = False

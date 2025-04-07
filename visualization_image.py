@@ -2,6 +2,7 @@ from blocks import ReflectBlock, OpaqueBlock, RefractBlock
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
+
 def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
     """
     Trace a lazor's path until it exits the grid or reflects.
@@ -61,14 +62,17 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
 
     # Add black border around the grid
     ax.add_patch(Rectangle((-1, -1), 1, x_size_grid + 3, color='black'))
-    ax.add_patch(Rectangle((y_size_grid, -1), 1, x_size_grid + 3, color='black'))
+    ax.add_patch(Rectangle((y_size_grid, -1), 1,
+                 x_size_grid + 3, color='black'))
     ax.add_patch(Rectangle((-1, -1), y_size_grid + 3, 1, color='black'))
-    ax.add_patch(Rectangle((-1, x_size_grid), y_size_grid + 3, 1, color='black'))
+    ax.add_patch(Rectangle((-1, x_size_grid),
+                 y_size_grid + 3, 1, color='black'))
 
     fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
     # Map block class name to display character
-    block_type_dict = {'ReflectBlock': 'A', 'OpaqueBlock': 'B', 'RefractBlock': 'C'}
+    block_type_dict = {'ReflectBlock': 'A',
+                       'OpaqueBlock': 'B', 'RefractBlock': 'C'}
 
     # Apply solution to grid
     if solution is not None:

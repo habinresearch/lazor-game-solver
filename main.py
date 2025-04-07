@@ -67,7 +67,8 @@ def main():
     visual_handler = logging.FileHandler(visual_log_filename)
     visual_handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
     visual_logger.addHandler(visual_handler)
-    logging.info("Visual logger initialized with file: %s", visual_log_filename)
+    logging.info("Visual logger initialized with file: %s",
+                 visual_log_filename)
 
     # Reduce clutter from matplotlib font warnings
     logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)

@@ -1,4 +1,5 @@
 # test_board.py
+from blocks import ReflectBlock, RefractBlock
 import logging
 from board import Board
 from solver import test_solution
@@ -29,7 +30,6 @@ board = Board(data)
 
 # (Optional) Manually place fixed blocks or free blocks if you wish.
 # For example, to place a free ReflectBlock at cell (1,1):
-from blocks import ReflectBlock, RefractBlock
 
 board.place_free_block(0, 0, ReflectBlock())
 board.place_free_block(0, 2, ReflectBlock())

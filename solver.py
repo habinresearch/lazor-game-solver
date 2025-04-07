@@ -120,7 +120,8 @@ def test_solution(board, targets):
     board_copy = board.clone()
     visual_logger = logging.getLogger("visual")
     visual_board = visualize_board(board_copy)
-    visual_logger.debug("Visual board at start of test_solution:\n%s", visual_board)
+    visual_logger.debug(
+        "Visual board at start of test_solution:\n%s", visual_board)
 
     remaining_targets = set(targets)
     max_steps = 200  # Limit beam length to prevent infinite loops
@@ -181,7 +182,8 @@ def test_solution(board, targets):
                                 steps + 1,
                             )
                         )
-                continue  # Skip the normal move since we've handled the initial collision.
+                # Skip the normal move since we've handled the initial collision.
+                continue
 
         logging.debug(
             "Beam step %d: current position (%d, %d) with direction (%d, %d)",
@@ -196,7 +198,8 @@ def test_solution(board, targets):
 
         next_x = x + dx
         next_y = y + dy
-        logging.debug("Beam step %d: moving to (%d, %d)", steps + 1, next_x, next_y)
+        logging.debug("Beam step %d: moving to (%d, %d)",
+                      steps + 1, next_x, next_y)
 
         if not (
             0 <= next_x < board_copy.orig_width * 2 + 1
@@ -230,9 +233,11 @@ def test_solution(board, targets):
                 break
 
         if collided_block is not None:
-            new_directions = collided_block.interact((dx, dy), (next_x, next_y))
+            new_directions = collided_block.interact(
+                (dx, dy), (next_x, next_y))
             if not new_directions:
-                logging.debug("Beam stopped by block at (%d, %d)", next_x, next_y)
+                logging.debug(
+                    "Beam stopped by block at (%d, %d)", next_x, next_y)
             else:
                 for new_dir in new_directions:
                     new_dx, new_dy = new_dir
@@ -245,7 +250,8 @@ def test_solution(board, targets):
                         new_dx,
                         new_dy,
                     )
-                    beam_queue.append((next_x, next_y, new_dx, new_dy, steps + 1))
+                    beam_queue.append(
+                        (next_x, next_y, new_dx, new_dy, steps + 1))
         else:
             beam_queue.append((next_x, next_y, dx, dy, steps + 1))
     return len(remaining_targets) == 0

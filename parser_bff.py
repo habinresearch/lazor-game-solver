@@ -20,8 +20,8 @@ def parse_bff_file(filename):
     # Read and clean lines (ignore comments and blank lines)
     with open(filename, 'r') as f:
         lines = [
-            line.strip() 
-            for line in f 
+            line.strip()
+            for line in f
             if not line.strip().startswith('#') and line.strip() != ''
         ]
 
