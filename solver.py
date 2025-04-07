@@ -6,16 +6,33 @@ from visualization import visualize_board
 
 
 def log_board_state(board, message="Current board state"):
+    """
+    Logs a visual representation of the current board.
+
+    Args:
+        board (Board): The Lazor game board instance.
+        message (str): An optional message to prefix the board state.
+    """
     state = visualize_board(board)
     logging.debug("%s:\n%s", message, state)
 
 
 def solve(board):
     """
-    Use backtracking to place free blocks into candidate positions until a solution is found.
-    This version accounts for permutations by trying each available free block type at every
-    candidate position.
-    Returns a list of free block placements (their original positions and types) or None.
+    Attempt to solve the Lazor game board using recursive backtracking.
+
+    The function attempts all permutations of available block placements into valid
+    free positions until a configuration is found such that all targets are hit
+    by lazors.
+
+    Args:
+        board (Board): The initialized board containing grid, lasers, targets, and block constraints.
+
+    Returns:
+        list of tuple or None:
+            If a solution is found, returns a list of tuples:
+                (position (i, j), block class name as string).
+            If no solution is found, returns None.
     """
     targets = set(board.points)
 
@@ -29,32 +46,40 @@ def solve(board):
     positions = board.free_positions
 
     def backtrack(pos_index, free_counts):
-        # If no free blocks remain, check if the board is a solution.
+        """
+        Recursive helper function to try placing blocks and solving the puzzle.
+
+        Args:
+            pos_index (int): The current index in the list of candidate positions.
+            free_counts (dict): Remaining counts of each block type.
+
+        Returns:
+            list of tuple or None: A valid solution or None if backtracking fails.
+        """
+        # Base case: no free blocks left to place
         if all(count == 0 for count in free_counts.values()):
             if test_solution(board, targets):
-                sol = [
+                return [
                     (block.orig_pos, type(block).__name__)
                     for block in board.free_blocks_placed
                 ]
-                return sol
-            else:
-                return None
+            return None
 
-        # If we've exhausted positions, backtrack.
+        # Base case: all positions exhausted
         if pos_index >= len(positions):
             return None
 
-        # Option 1: Skip the current candidate position.
+        # Option 1: skip current position
         result = backtrack(pos_index + 1, free_counts)
         if result is not None:
             return result
 
-        # Option 2: Try placing each type of free block at the current position (if available).
+        # Option 2: try placing each block type at current position
         i, j = positions[pos_index]
         if board.is_placeable(i, j):
             for block_type in ["A", "B", "C"]:
                 if free_counts.get(block_type, 0) > 0:
-                    # Instantiate the block based on type.
+                    # Instantiate block of the given type
                     if block_type == "A":
                         block = ReflectBlock()
                     elif block_type == "B":
@@ -62,7 +87,6 @@ def solve(board):
                     elif block_type == "C":
                         block = RefractBlock()
 
-                    # Place the block and decrement its count.
                     board.place_free_block(i, j, block)
                     free_counts[block_type] -= 1
 
@@ -70,7 +94,7 @@ def solve(board):
                     if result is not None:
                         return result
 
-                    # Backtrack: remove the block and restore its count.
+                    # Undo the move (backtrack)
                     board.remove_free_block(i, j)
                     free_counts[block_type] += 1
 
@@ -81,9 +105,17 @@ def solve(board):
 
 def test_solution(board, targets):
     """
-    Simulate laser paths on a cloned board so that mutable block states (e.g. in RefractBlock)
-    do not persist across simulation runs.
-    Returns True if all targets are hit; otherwise, False.
+    Test whether a given board configuration causes all lazors to hit the required target points.
+
+    Lazors are simulated step-by-step, interacting with placed blocks. If all targets are hit
+    before the lazors exit or reach the step limit, the function returns True.
+
+    Args:
+        board (Board): A Lazor game board.
+        targets (set of tuple): Set of (x, y) coordinates that lazors must hit.
+
+    Returns:
+        bool: True if all targets are hit, False otherwise.
     """
     board_copy = board.clone()
     visual_logger = logging.getLogger("visual")
@@ -91,10 +123,12 @@ def test_solution(board, targets):
     visual_logger.debug("Visual board at start of test_solution:\n%s", visual_board)
 
     remaining_targets = set(targets)
-    max_steps = 200
+    max_steps = 200  # Limit beam length to prevent infinite loops
 
     blocks = board_copy.get_placed_blocks()
     beam_queue = []
+
+    # Initialize lazors
     for lx, ly, vx, vy in board_copy.lasers:
         beam_queue.append((lx, ly, vx, vy, 0))
         logging.debug(
