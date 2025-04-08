@@ -1,1 +1,0 @@
-[((1, 1), 'OpaqueBlock'), ((2, 0), 'OpaqueBlock'), ((2, 1), 'OpaqueBlock')]

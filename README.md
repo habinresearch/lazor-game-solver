@@ -1,9 +1,13 @@
 # Lazor Project
 
-## Solve bffs by
+## Solve bffs by running
 
-python main.py data/tutorial_1.bff
+python main.py path/to/bff
 
-## Run tests by
+## For example
+
+python main.py data/mad_1.bff
+
+## Run unit tests by
 
 python -m unittest discover tests
