@@ -5,7 +5,7 @@ from matplotlib.patches import Rectangle
 
 def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
     """
-    Trace a lazor's path until it exits the grid or reflects.
+    Trace a lazor's path until it exits the grid or interacts with a block.
 
     Args:
         lazor_grid (Board): The current board configuration.
@@ -15,9 +15,11 @@ def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
         grid_size_y (int): Height of the lazor grid.
 
     Returns:
-        tuple: (end_x, end_y, [new_vx, new_vy]) – where the beam stops or reflects.
+        tuple: (end_x, end_y, [list of new direction vectors])
     """
     is_first_turn = True
+    new_directions = []  # Default: no new directions
+
     while (0 < x < grid_size_x and 0 < y < grid_size_y) or is_first_turn:
         x += vx
         y += vy
@@ -26,21 +28,32 @@ def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
         blocks = lazor_grid.get_placed_blocks()
         for block in blocks:
             if block.within_boundaries(x, y):
+                # Get new beam directions from block's interaction.
                 new_directions = block.interact((vx, vy), (x, y))
-                if new_directions:  # Not blocked by opaque
-                    new_directions = list(new_directions[0])
+                if new_directions:
+                    # Ensure we have a list of direction vectors.
+                    if isinstance(new_directions[0], (list, tuple)):
+                        new_directions = [list(direction)
+                                          for direction in new_directions]
+                    else:
+                        new_directions = [list(new_directions)]
                 found_collision = True
-                break  # Stop at first hit
+                break  # Stop at the first collision
 
         if found_collision:
+            # Only return new directions if still within bounds
             if 0 <= x <= grid_size_x and 0 <= y <= grid_size_y:
                 return x, y, new_directions
+            else:
+                # Beam already out-of-bound; do not propagate further.
+                return x, y, []
 
         if is_first_turn:
             is_first_turn = False
 
-    # No reflection or out of bounds
-    return x, y, [vx, vy]
+    # If while loop ended (i.e., beam went out-of-bound with no collision),
+    # return no new directions.
+    return x, y, []
 
 
 def save_laser_image(lazor_grid, solution=None, filename=None):
@@ -118,14 +131,11 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
     while lazors:
         start_x, start_y, vx, vy = lazors.pop()
 
-        end_x, end_y, new_dir = find_lazor_endpoint(
+        end_x, end_y, new_dirs = find_lazor_endpoint(
             lazor_grid, start_x, start_y, vx, vy, x_size_grid, y_size_grid
         )
 
-        # If the beam bounced/reflected, queue the new one
-        if new_dir and new_dir != [vx, vy]:
-            lazors.append([end_x, end_y, new_dir[0], new_dir[1]])
-
+        # Draw the beam segment from start to end.
         lazor_length_x = end_x - start_x
         lazor_length_y = end_y - start_y
 
@@ -134,6 +144,14 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
             lazor_length_x, lazor_length_y,
             head_width=0.2, head_length=0.2, fc='red', ec='red'
         )
+
+        # Only queue new beams if the endpoint is within bounds.
+        if 0 <= end_x <= x_size_grid and 0 <= end_y <= y_size_grid:
+            if new_dirs:
+                for direction in new_dirs:
+                    print(
+                        f'Queuing new beam: {[end_x, end_y, direction[0], direction[1]]}')
+                    lazors.append([end_x, end_y, direction[0], direction[1]])
 
     ax.axis("off")
     ax.set_aspect("equal")
