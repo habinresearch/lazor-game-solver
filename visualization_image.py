@@ -20,7 +20,7 @@ def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
     is_first_turn = True
     new_directions = []  # Default: no new directions
 
-    while (0 <= x <= grid_size_x and 0 <= y <= grid_size_y) or is_first_turn:
+    while (0 <= x <= grid_size_y and 0 <= y <= grid_size_x) or is_first_turn:
         x += vx
         y += vy
         found_collision = False
@@ -43,7 +43,7 @@ def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
 
         if found_collision:
             # Only return new directions if still within bounds
-            if 0 <= x <= grid_size_x and 0 <= y <= grid_size_y:
+            if 0 <= x <= grid_size_y and 0 <= y <= grid_size_x:
                 return x, y, new_directions
             else:
                 # Beam already out-of-bound; do not propagate further.
@@ -140,7 +140,6 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
                 if block.within_boundaries(init_x, init_y):
                     collided_block = block
                     break
-
             if collided_block is not None:
                 new_directions = collided_block.interact((vx, vy), (x, y))
                 # If the block redirects the beam, queue up the new beams.
@@ -175,7 +174,7 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
         )
 
         # If the beam remains within bounds and produces new directions, queue them.
-        if 0 <= end_x <= x_size_grid and 0 <= end_y <= y_size_grid:
+        if 0 <= end_x <= y_size_grid and 0 <= end_y <= x_size_grid:
             if new_dirs:
                 if isinstance(new_dirs[0], (list, tuple)):
                     new_dirs_list = [list(direction) for direction in new_dirs]
