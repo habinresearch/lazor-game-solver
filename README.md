@@ -1,4 +1,4 @@
-# Lazor Project
+# Lazor Game Solver
 
 A program that will automatically find solutions to the "Lazors" game.
 
