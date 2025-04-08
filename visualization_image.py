@@ -149,8 +149,6 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
         if 0 <= end_x <= x_size_grid and 0 <= end_y <= y_size_grid:
             if new_dirs:
                 for direction in new_dirs:
-                    print(
-                        f'Queuing new beam: {[end_x, end_y, direction[0], direction[1]]}')
                     lazors.append([end_x, end_y, direction[0], direction[1]])
 
     ax.axis("off")
