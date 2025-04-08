@@ -1,7 +1,6 @@
 from blocks import ReflectBlock, OpaqueBlock, RefractBlock
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-import logging
 
 
 def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
@@ -21,7 +20,7 @@ def find_lazor_endpoint(lazor_grid, x, y, vx, vy, grid_size_x, grid_size_y):
     is_first_turn = True
     new_directions = []  # Default: no new directions
 
-    while (0 < x < grid_size_x and 0 < y < grid_size_y) or is_first_turn:
+    while (0 <= x <= grid_size_x and 0 <= y <= grid_size_y) or is_first_turn:
         x += vx
         y += vy
         found_collision = False
@@ -76,10 +75,10 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
     ax.set_ylim(-1, x_size_grid + 1)
 
     # Add black border around the grid
-    ax.add_patch(Rectangle((-1, -1), 1, x_size_grid + 3, color="black"))
-    ax.add_patch(Rectangle((y_size_grid, -1), 1, x_size_grid + 3, color="black"))
-    ax.add_patch(Rectangle((-1, -1), y_size_grid + 3, 1, color="black"))
-    ax.add_patch(Rectangle((-1, x_size_grid), y_size_grid + 3, 1, color="black"))
+    ax.add_patch(Rectangle((-1, -1), 1, x_size_grid + 3, color="slategrey"))
+    ax.add_patch(Rectangle((y_size_grid, -1), 1, x_size_grid + 3, color="slategrey"))
+    ax.add_patch(Rectangle((-1, -1), y_size_grid + 3, 1, color="slategrey"))
+    ax.add_patch(Rectangle((-1, x_size_grid), y_size_grid + 3, 1, color="slategrey"))
 
     fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
@@ -98,7 +97,7 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
                 continue
             x_pos = x * 2 + 1
             y_pos = y * 2 + 1
-            color = {"x": "black", "A": "green", "B": "grey", "C": "blue"}.get(
+            color = {"x": "slategrey", "A": "green", "B": "black", "C": "blue"}.get(
                 col, "white"
             )  # Default to white if unknown
             square = plt.Rectangle(
@@ -140,13 +139,6 @@ def save_laser_image(lazor_grid, solution=None, filename=None):
             for block in blocks:
                 if block.within_boundaries(init_x, init_y):
                     collided_block = block
-                    logging.debug(
-                        "Initial beam collision at (%.1f, %.1f) with %s at original cell %s",
-                        init_x,
-                        init_y,
-                        type(block).__name__,
-                        block.orig_pos,
-                    )
                     break
 
             if collided_block is not None:
