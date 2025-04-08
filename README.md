@@ -2,11 +2,11 @@
 
 ## Solve bffs by running in project folder
 
-python src/main.py path/to/bff
+python main.py path/to/bff
 
 ## For example
 
-python src/main.py data/mad_1.bff
+python main.py data/mad_1.bff
 
 ## Run unit tests by
 
